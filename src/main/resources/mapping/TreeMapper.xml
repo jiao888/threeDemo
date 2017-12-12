@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jk.dao.TreeMapper" >
+  <resultMap id="BaseResultMap" type="com.jk.model.Tree" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="pid" property="pid" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="icon" property="icon" jdbcType="VARCHAR" />
+    <result column="target" property="target" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, pid, name, icon, target, url
+  </sql>
+  
+  <select id="queryTree2" resultMap="BaseResultMap" >
+  SELECT t.* from t_tree t,user_role u ,role_tree re 
+	where t.id = re.treeId
+		 and u.roleId = re.roleId
+		 and u.userId = ${id} 
+	  GROUP BY t.id
+  </select>
+  
+   <select id="queryTree" parameterType="com.jk.model.Tree" resultMap="BaseResultMap">
+    select * from t_tree where 1=1
+     <if test="id !=null">
+       and  pid =#{id}
+     </if>
+   </select>
+  
+  <select id="asyncTreeList" parameterType="com.jk.model.Tree" resultMap="BaseResultMap">
+     select * from t_tree where pid is null
+  </select>
+  
+  <insert id="insertMany" parameterType="java.util.List">
+     insert into t_tree (pid,name,icon,target,url)   
+    values  
+    <foreach collection="list" item="item" index="index" separator="," >  
+        (#{item.pid},#{item.name},#{item.icon},#{item.target},#{item.url})  
+    </foreach> 
+  </insert>
+  
+  <update id="updateAfterSave" parameterType="com.jk.model.Tree">
+  
+   update t_tree
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="icon != null" >
+        icon = #{icon,jdbcType=VARCHAR},
+      </if>
+      <if test="target != null" >
+        target = #{target,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <delete id="deleteTreeNodes" parameterType="com.jk.model.Tree" >
+    delete from t_tree
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+   <insert id="addAfterSave" parameterType="com.jk.model.Tree" >
+    insert into t_tree
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="pid != null" >
+        pid,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="icon != null" >
+        icon,
+      </if>
+      <if test="target != null" >
+        target,
+      </if>
+      <if test="url != null" >
+        url,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="pid != null" >
+        #{pid,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="icon != null" >
+        #{icon,jdbcType=VARCHAR},
+      </if>
+      <if test="target != null" >
+        #{target,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        #{url,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+</mapper>

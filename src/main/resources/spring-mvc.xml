@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+http://www.springframework.org/schema/context 
+http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+http://www.springframework.org/schema/mvc 
+http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+	<!-- 自动扫描controller包下的所有类，使其认为spring mvc的控制器 -->
+	<context:component-scan base-package="com.jk.controller" />
+
+	<!-- 避免IE执行AJAX时,返回JSON出现下载文件 -->
+	<bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+		<property name="supportedMediaTypes">
+			<list>
+				<value>text/html;charset=UTF-8</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 启动Spring MVC的注解功能，完成请求和注解POJO的映射 -->
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<ref bean="mappingJacksonHttpMessageConverter" /><!-- json转换器 -->
+			</list>
+		</property>
+	</bean>
+
+	<!-- 对模型视图名称的解析，即在模型视图名称添加前后缀 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" p:prefix="/" p:suffix=".jsp" />
+
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding">
+			<value>UTF-8</value>
+		</property>
+		<property name="maxUploadSize">
+			<value>32505856</value><!-- 上传文件大小限制为31M，31*1024*1024 -->
+		</property>
+		<property name="uploadTempDir">
+            <value>/upload/</value><!--上传后的目录名-->
+        </property>
+		<property name="maxInMemorySize">
+			<value>4096</value>
+		</property>
+	</bean>
+   <!-- 拦截器 -->
+	 <mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<bean class="com.jk.interceptors.SecurityInterceptor">
+				<!--不需要权限验证的地址-->
+				<property name="excludeUrls">
+					<list>
+						<value>/initController/init</value><!-- 初始化数据库 -->
+						<value>/treeController/queryTree2</value><!--首页左侧功能菜单-->
+						<value>/treeController/queryTree</value>
+						<value>/userController/reg</value><!--用户注册-->
+						 <value>/userController/login</value><!--用户登录-->
+						<value>/userController/error</value><!--用户登录-->
+						<value>/roleController/roleNodes</value>
+						<value>/roleController/treeNodes</value>
+						<value>/roleController/setTreeChange</value>
+						<value>/roleController/querysettree</value>
+						<value>/roleController/selectRoleList</value>
+						<value>/roleController/tosettree</value>
+						<value>/roleController/roleList</value>
+						<value>/roleController/toShowRole</value>
+						<value>/roleController/allotRole</value>
+						<value>/treeController/toShow</value>
+						<value>/treeController/exportExcel</value>
+						<value>/userController/loginCombogrid</value><!--用户登录里面的combogrid功能-->
+						<value>/userController/logout</value><!--注销登录-->
+						<value>/userController/selectUserList</value><!--用户列表信息-->
+						<value>/roleController/tree</value><!--用户访问角色树(只能看到自己拥有的角色)-->
+						<value>/roleController/toshow</value><!--用户访问角色树-->
+						<value>/userController/editCurrentUserPwdPage</value><!--用户修改自己的密码页面-->
+						<value>/userController/editCurrentUserPwd</value><!--用户修改自己的密码-->
+						<value>/userController/currentUserRolePage</value><!--查看自己的角色页面-->
+						<value>/treeController/getCurrentUserTreeNodes</value><!--查看自己的权限页面-->
+						<value>/roleController/toTree</value>
+					</list>
+				</property>
+			</bean>
+		</mvc:interceptor>
+	</mvc:interceptors> 
+	
+</beans>
